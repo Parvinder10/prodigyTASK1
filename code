@@ -1,0 +1,85 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv(r"C:\Users\parvk\OneDrive\Desktop\worldpopulationdata.csv")
+
+# Dataset Exploration
+print(df.head())
+print(df.tail())
+print("\nShape:", df.shape)
+print("\nColumns:", df.columns)
+print("\nDescriptive Stats:\n", df.describe())
+print("\nDuplicate Rows:", df.duplicated().sum())
+print("\nMissing Values:\n", df.isna().sum())
+
+#Unique Country and Code Info
+print("\nUnique Countries:", df['Country Name'].nunique())
+print(df['Country Name'].unique())
+
+print("\nUnique Country Codes:", df['Country Code'].nunique())
+print(df['Country Code'].unique())
+
+# Filter Total Population Data
+total_population_data = df[df['Series Code'] == 'SP.POP.TOTL']
+
+# Sort and Get Top 10 Countries by 2022 Population
+total_top10_2022 = total_population_data.sort_values(by='2022', ascending=False).head(10)
+print("\nTop 10 Countries by Total Population (2022):\n", total_top10_2022[['Country Name']])
+
+
+# Bar Plots for Population Over the Years 
+years_to_plot = ['2001', '2010', '2016', '2022']
+fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+fig.suptitle("Top 10 Countries by Total Population", fontsize=16)
+
+for i, year in enumerate(years_to_plot):
+    ax = axes[i//2, i%2]
+    sns.barplot(
+        x=year,
+        y='Country Name',
+        data=total_top10_2022,
+        hue='Country Name',              
+        palette='coolwarm',
+        ax=ax,
+        legend=False                    
+    )
+    ax.set_title(f"Year: {year}")
+    ax.set_xlabel("Population")
+    ax.set_ylabel("Country")
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+S
+#Bottom 10 Countries by Population
+total_bottom10_2022 = total_population_data.sort_values(by='2022', ascending=True).head(10)
+print("\nBottom 10 Countries by Total Population (2022):\n", total_bottom10_2022[['Country Name']])
+
+#Gender-wise Population
+male_data = df[df['Series Code'] == 'SP.POP.TOTL.MA.IN']
+female_data = df[df['Series Code'] == 'SP.POP.TOTL.FE.IN']
+
+# Sort by 2022 Population
+male_top10_2022 = male_data.sort_values(by='2022', ascending=False).head(10)
+female_top10_2022 = female_data.sort_values(by='2022', ascending=False).head(10)
+
+print("\nTop 10 Countries by Male Population (2022):\n", male_top10_2022[['Country Name']])
+print("\nTop 10 Countries by Female Population (2022):\n", female_top10_2022[['Country Name']])
+
+# Histogram: Distribution of Total Population in 2022
+plt.figure(figsize=(10, 6))
+population_2022 = total_population_data['2022'].dropna()  # Drop NaN values for histogram
+
+# Convert population values to numeric if they are not already
+population_2022 = pd.to_numeric(population_2022, errors='coerce').dropna()
+
+# Plot histogram
+plt.hist(population_2022, bins=30, color='skyblue', edgecolor='black')
+plt.title('Distribution of Total Population (2022)', fontsize=14)
+plt.xlabel('Population')
+plt.ylabel('Number of Countries')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
